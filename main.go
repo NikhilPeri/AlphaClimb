@@ -2,10 +2,12 @@ package main
 
 import (
 	"bufio"
+	"encoding/csv"
 	"fmt"
 	"log"
 	"os"
 	"sort"
+	"strconv"
 )
 
 type Climb struct {
@@ -54,9 +56,18 @@ func main() {
 		return climbs[i].biggestMove < climbs[j].biggestMove
 	})
 
+	fmt.Println("Top 10 Easiest")
 	for i := 1; i <= 10; i++ {
 		fmt.Printf("Rank: %d, Score: %d, Word: %s\n", i, climbs[i].biggestMove, climbs[i].word)
 	}
+
+	csvFile, err := os.Create("words_scored.csv")
+	defer csvFile.Close()
+	csvwriter := csv.NewWriter(csvFile)
+	for _, climb := range climbs {
+		_ = csvwriter.Write([]string{strconv.Itoa(climb.biggestMove), climb.word})
+	}
+	csvwriter.Flush()
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
